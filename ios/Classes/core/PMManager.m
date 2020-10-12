@@ -451,9 +451,9 @@
 
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
           NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchFullSizeVideo:asset handler:handler];
-      }
+      // if (progress == 1.0) {
+      //   [self fetchFullSizeVideo:asset handler:handler];
+      // }
   }];
 
   [options setNetworkAccessAllowed:YES];
@@ -509,15 +509,15 @@
                  resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
-  options.synchronous = YES;
+  options.synchronous = NO;
   options.version = PHImageRequestOptionsVersionCurrent;
 
   [options setNetworkAccessAllowed:YES];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
           NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchFullSizeImageFile:asset resultHandler:handler];
-      }
+      // if (progress == 1.0) {
+      //   [self fetchFullSizeImageFile:asset resultHandler:handler];
+      // }
   }];
 
   [manager requestImageForAsset:asset
