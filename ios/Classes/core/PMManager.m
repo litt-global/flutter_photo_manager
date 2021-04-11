@@ -457,33 +457,28 @@
   }];
 
   [options setNetworkAccessAllowed:YES];
+  
+  [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPreset960x540 resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
+          BOOL downloadFinish = [PMManager isDownloadFinish:info];
 
-  [[PHImageManager defaultManager]
-          requestAVAssetForVideo:asset
-                         options:options
-                   resultHandler:^(AVAsset *_Nullable asset,
-                           AVAudioMix *_Nullable audioMix,
-                           NSDictionary *_Nullable info) {
-                       BOOL downloadFinish = [PMManager isDownloadFinish:info];
-
-                       if (!downloadFinish) {
-                         return;
-                       }
-
-                       NSString *preset = AVAssetExportPresetHighestQuality;
-                       AVAssetExportSession *exportSession =
-                               [AVAssetExportSession exportSessionWithAsset:asset
-                                                                 presetName:preset];
-                       if (exportSession) {
-                         exportSession.outputFileType = AVFileTypeMPEG4;
-                         exportSession.outputURL = [NSURL fileURLWithPath:path];
-                         [exportSession exportAsynchronouslyWithCompletionHandler:^{
-                             [handler reply:path];
-                         }];
-                       } else {
-                         [handler reply:nil];
-                       }
-                   }];
+          if (!downloadFinish) {
+            return;
+          }
+      
+          if (exportSession) {
+            exportSession.outputFileType = AVFileTypeMPEG4;
+            exportSession.outputURL = [NSURL fileURLWithPath:path];
+            exportSession.shouldOptimizeForNetworkUse = true;
+              
+            [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                if (exportSession.error != nil)
+                    NSLog(@"video export error: %@", exportSession.error);
+                [handler reply:path];
+            }];
+          } else {
+            [handler reply:nil];
+          }
+  }];
 }
 
 - (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
